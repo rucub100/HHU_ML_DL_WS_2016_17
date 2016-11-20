@@ -26,40 +26,26 @@ mnist_pixels = 784
 #placing shape here is useful if you have that info, because tf will throw error if other pic sizes are flowing in! :)
 x = tf.placeholder('float',[None, mnist_pixels])
 y = tf.placeholder('float')
+y_ = tf.placeholder(tf.float32, [None, 10])
+sess = tf.InteractiveSession()
 
-# # Create the model
-# x = tf.placeholder(tf.float32, [None, 784])
-# W = tf.Variable(tf.zeros([784, 10]))
-# b = tf.Variable(tf.zeros([10]))
-# y = tf.matmul(x, W) + b
+# 
+def weight_variable(shape):
+	"""Creates a tf Variable of shape 'shape' with random elements"""
+	initial = tf.truncated_normal(shape, stddev=0.1)
+	return tf.Variable(initial)
 
-# # Define loss and optimizer
-# y_ = tf.placeholder(tf.float32, [None, 10])
+def bias_variable(shape):
+	"""Create a small bias of shape 'shape' with contants values of 0.1"""
+	initial = tf.constant(0.1, shape=shape)
+	return tf.Variable(initial)
 
-# # The raw formulation of cross-entropy,
-# #
-# #	 tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(tf.softmax(y)),
-# #																 reduction_indices=[1]))
-# #
-# # can be numerically unstable.
-# #
-# # So here we use tf.nn.softmax_cross_entropy_with_logits on the raw
-# # outputs of 'y', and then average across the batch.
-# cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(y, y_))
-# train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
+def conv2d(x, W):
+	"""Use a conv layer with weights W on zero padded input x and stride 1"""
+	return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
 
-# sess = tf.InteractiveSession()
-# # Train
-# tf.initialize_all_variables().run()
-# for _ in range(1000):
-# 	batch_xs, batch_ys = mnist.train.next_batch(100)
-# 	sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})
-
-# # Test trained model
-# correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
-# accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-# print(sess.run(accuracy, feed_dict={x: mnist.test.images,y_: mnist.test.labels}))
-
+def neural_network_model_2(x):
+	return y_conv
 
 
 """
@@ -88,38 +74,39 @@ def neural_network_model(data):
 	return output
 
 def train_neural_network(x):
-	prediction = neural_network_model(x)
-	cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(prediction, y))
-	print type(prediction)
-	print "prediction:", prediction
-	print "y:", y
-	print "cost:", cost
-	print "-"*50
-	# optional param learning rate, default = 0.001
-	optimizer = tf.train.AdamOptimizer().minimize(cost)
-	#cycles of feed forward + backprop
-	hm_epochs = 15
-	#y = tf.placeholder('float')
-	
-	with tf.Session() as sess:
-		sess.run(tf.initialize_all_variables())
+	W_conv1 = weight_variable([5,5,1,32])
+	b_conv1 = bias_variable([32])
+	x_image = tf.reshape(x, [-1,28,28,1])
+	h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
 
-		for epoch in range(hm_epochs):
-			epoch_loss = 0
-			for _ in range(int(mnist.train.num_examples/batch_size)):
-				# tf is very high level, lots of helper functions!!
-				epoch_x, epoch_y = mnist.train.next_batch(batch_size)
-				_, c = sess.run(
-					[optimizer, cost],
-					feed_dict = {x:epoch_x, y:epoch_y}
-				)
-				epoch_loss += c
-			print 'Epoch ',epoch,' completed out of ',hm_epochs, 'loss: ', epoch_loss
+	W_fc1 = weight_variable([28 * 28 * 32, 50])
+	b_fc1 = bias_variable([50])
+	h_conv1_flat = tf.reshape(h_conv1, [-1, 28*28*32])
+	h_fc1 = tf.nn.relu(tf.matmul(h_conv1_flat, W_fc1) + b_fc1)
 
-		correct = tf.equal(tf.argmax(prediction,1), tf.argmax(y,1))
+	keep_prob = tf.placeholder(tf.float32)
+	h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
 
-		accuracy = tf.reduce_mean(tf.cast(correct, 'float'))
-		print 'Accuracy: ', accuracy.eval({x:mnist.test.images, y:mnist.test.labels})
+	W_fc2 = weight_variable([50, 10])
+	b_fc2 = bias_variable([10])
+
+	y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
+
+	cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(y_conv, y_))
+	train_step = tf.train.AdamOptimizer(0.01).minimize(cross_entropy)
+	correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_,1))
+	accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+	sess.run(tf.initialize_all_variables())
+	for i in range(20000):
+		batch = mnist.train.next_batch(50)
+		if i%100 == 0:
+			train_accuracy = accuracy.eval(feed_dict={
+					x:batch[0], y_: batch[1], keep_prob: 1.0})
+			print("step %d, training accuracy %g"%(i, train_accuracy))
+		train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
+
+	print("test accuracy %g"%accuracy.eval(feed_dict={
+			x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
 
 
 if __name__ == "__main__":
