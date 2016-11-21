@@ -5,7 +5,7 @@ import tensorflow as tf
 
 from tensorflow.examples.tutorials.mnist import input_data
 
-mnist = input_data.read_data_sets("data/", one_hot=True)
+#mnist = input_data.read_data_sets("data/", one_hot=True)
 
 
 """
@@ -13,18 +13,19 @@ Define layer size etc
 """
 
 LEARNING_RATE = 0.01
-
-n_classes = 10
 #use batches to shiffer through reasonable data patches
 BATCH_SIZE = 100
 #784=28*28 pixels in all mnist pics
 MNIST_WIDTH = 28
 MNIST_HEIGHT = 28
+#pictures are divided into ten different classes
+MNIST_CLASSES = 10
+#number of pixels in one picture
 MNIST_PIXELS = MNIST_WIDTH * MNIST_HEIGHT
 #placing shape here is useful if you have that info, because tf will throw error if other pic sizes are flowing in! :)
 x = tf.placeholder('float',[None, MNIST_PIXELS])
 y = tf.placeholder('float')
-y_ = tf.placeholder(tf.float32, [None, 10])
+y_ = tf.placeholder(tf.float32, [None, MNIST_CLASSES])
 sess = tf.InteractiveSession()
 
 
@@ -33,18 +34,17 @@ def weight_variable(shape):
     initial = tf.truncated_normal(shape, stddev=0.1)
     return tf.Variable(initial)
 
-
 def bias_variable(shape):
     """Create a small bias of shape 'shape' with contants values of 0.1"""
     initial = tf.constant(0.1, shape=shape)
     return tf.Variable(initial)
-
 
 def conv2d(x, W):
     """Use a conv layer with weights W on zero padded input x and stride 1"""
     return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
 
 def max_pool_2x2(x):
+    """Create a 2x2 pooling layer with strides 2, reducing the resolution"""
     return tf.nn.max_pool(x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
 
 
@@ -76,8 +76,8 @@ def train_neural_network(x):
     keep_prob = tf.placeholder(tf.float32)
     h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
 
-    W_fc2 = weight_variable([50, 10])
-    b_fc2 = bias_variable([10])
+    W_fc2 = weight_variable([50, MNIST_CLASSES])
+    b_fc2 = bias_variable([MNIST_CLASSES])
 
     y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
 
@@ -99,11 +99,8 @@ def train_neural_network(x):
 
 
 if __name__ == "__main__":
+    mnist = input_data.read_data_sets("data/", one_hot=True)
     try:
         train_neural_network(x)
     except KeyboardInterrupt:
         print
-
-
-
-
