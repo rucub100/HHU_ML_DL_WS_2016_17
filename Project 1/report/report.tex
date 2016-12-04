@@ -209,12 +209,39 @@ Machine Learning, Deep Learning, CNN, Neural Network, MNIST, handwritten digits
 
 \section{Die Architektur}
 
+\newpage
 \section{Das Training}
+ Wir haben die gelernten Gewichte der beiden faltenden Schichten durch umformen als zweidimensionale Grauwertbilder visualisiert. Man erknnt lediglich ein Rauschen, ähnlich wie man es von einer zufälligen Besetzung erwarten würde. Das zweite Bild hat eine höhere Auflösung, da die Eingabe für den Filter nach der ersten faltenden Schicht eine deutlich höhere Dimension hat, als der eindimensionale Kanal für die Graustufenwerte des ursprünglichen Bildes.
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.6]{learned_conv1_weights}
+\caption{Visualisierung der gelernten Gewichter der ersten faltenden Schicht.}
+\end{figure}
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.6]{learned_conv2_weights}
+\caption{Visualisierung der gelernten Gewichter der ersten faltenden Schicht.}
+\end{figure}
 
+\noindent Dass das Netz tatsächlich inrgendwelche features erlernt hat, ist anhand der letzten beiden Abbildungen zu sehen. Faltet man eine homogene Bildfläche mit den gelernten Filtern, so entstehen linienartige Muster. Natürlich kann man keinen vierdimensionalen Tensor ohne manipulation darstellen, sodass wir diese auf zwei dimensionen umgeformt haben.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.6]{conv1_on_plain_image}
+\caption{Ausgabe der ersten faltenden Schicht für eine homogene Bildfläche.}
+\end{figure}
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.8]{conv2_on_conv1_on_plain_image}
+\caption{Ausgabe der zweiten faltenden Schicht.}
+\end{figure}
+
+\newpage
 \section{Test und Auswertung}
 Listing \ref{lst1}
 
 \appendices
+\newpage
 \section{Code-Schnipsel}
 
 \begin{lstlisting}[caption={Erzeugt ein Gewichts-Array mit zufällig initialisierten Werten. Die Dimensionen werden als Parameter entegengenommen.}, label=lst1]
