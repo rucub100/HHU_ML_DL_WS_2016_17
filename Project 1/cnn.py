@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 import json
 import sys
+import logging
 
 import tensorflow as tf
 
@@ -14,6 +15,12 @@ from tensorflow.examples.tutorials.mnist import input_data
 Define layer size etc
 """
 
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s %(message)s'
+)
+log = logging.getLogger('CNN')
+
 config = None
 with open("config.json", "r") as config_file:
     config = json.load(config_file)
@@ -22,8 +29,10 @@ if config == None:
     sys.exit(1)
 
 LEARNING_RATE = config['learning_rate']
+log.info("Learning reate: %2f" % LEARNING_RATE)
 #use batches to shiffer through reasonable data patches
-BATCH_SIZE = config['batch_size']
+BATCH_SIZE = config['training_round_size']
+log.info("Batch size: %d" % BATCH_SIZE)
 #784=28*28 pixels in all mnist pics
 MNIST_WIDTH = 28
 MNIST_HEIGHT = 28
@@ -63,6 +72,7 @@ def train_neural_network(x):
     current_depth = 1
     x_image = tf.reshape(x, [-1, 28, 28, 1])
     # x is 1x28*28 ( x = [34,43,5,6,0,0,7,5,...] )
+    log.info("Create comutational graph...")
     for layer in config['layers']:
         type = layer['type']
         if type == "convolution":
@@ -78,8 +88,7 @@ def train_neural_network(x):
             current_size = current_size / 2
 
     #Fully connected layer
-    print "current_size:",current_size
-    print "current_depth:",current_depth
+    log.info("Create fully connected layer...")
     W_fc1 = weight_variable([int(current_size * current_size * current_depth), 50])
     b_fc1 = bias_variable([50])
     h_pool2_flat = tf.reshape(x_image, [-1, int(current_size * current_size * current_depth)])
@@ -95,6 +104,9 @@ def train_neural_network(x):
 
     training_rounds = config['training_rounds']
     training_round_size = config['training_round_size']
+    log.info("Training rounds: %d" % training_rounds)
+    log.info("Training round size: %d" % training_round_size)
+    log.info("Start training...")
     cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(y_conv, y_))
     train_step = tf.train.AdamOptimizer(0.01).minimize(cross_entropy)
     correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_,1))
@@ -105,11 +117,14 @@ def train_neural_network(x):
         if i%training_round_size == 0:
             train_accuracy = accuracy.eval(feed_dict={
                     x:batch[0], y_: batch[1], keep_prob: 1.0})
-            print("step %d, training accuracy %f"%(i, train_accuracy))
+            log.info("step %d, TRAINING ACCURACY: %f"%(i, train_accuracy))
         train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
+    i += 1
+    train_accuracy = accuracy.eval(feed_dict={x:batch[0], y_: batch[1], keep_prob: 1.0})
+    log.info("step %d, TRAINING ACCURACY: %f"%(i, train_accuracy))
 
-    print("test accuracy %g"%accuracy.eval(feed_dict={
-            x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
+    log.info("Start testing...")
+    log.info("TEST ACCURACY: %g" % accuracy.eval(feed_dict={x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
 
 
 if __name__ == "__main__":
