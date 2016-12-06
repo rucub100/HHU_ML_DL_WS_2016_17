@@ -1,4 +1,4 @@
-We tried training and teting our neural network with the following layer configuration
+We tried training and testing our neural network with the following layer configuration
 
 {
     "learning_rate": 0.01,
