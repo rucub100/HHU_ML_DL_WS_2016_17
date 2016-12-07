@@ -184,27 +184,7 @@ Machine Learning, Deep Learning, CNN, Neural Network, MNIST, handwritten digits
 \IEEEdisplaynontitleabstractindextext
 \IEEEpeerreviewmaketitle
 \IEEEraisesectionheading{\section{Einleitung}\label{sec:introduction}}
-\IEEEPARstart{S}{chreibe} die Einleiung am Ende, wenn alles andere Festgelegt und niedergeschrieben ist...
-
-{\Large Aufgaben:}
-\begin{itemize}
-\item [2.] Trainiere den CNN. Erkläre alle implementierten Schritte, mögliche Performance Messungen und die benutzen Trainingsalgorithmen.
-\item [3.] Teste dein CNN und erkläre die Ergebnisse der Auswertung.
-\item [4.] Bekommt man die gleichen Resultate, wenn man das CNN mehrmals mit den gleichen Parametern ausführt? Was sind die Quellen der Zufälligkeit?
-\item [5.] Führe mehr Optimierungs-Iterationen aus. Werden die ERgebnisse dadurch besser? Wie lange dauert die berechnung (das Training)?
-\item [6.] Welchen Effekt hat eine Änderung der Lernrate für den Optimierer?
-\item [7.] Wie lernt das CNN? Kannst du bspw. einige gelernten \emph{features} aus der faltenden Schicht visualisieren?
-\item [8.] Ändere die Konfiguration der Schichten, bspw. Anzahl der \emph{Conv.} Filter, Größe der Filter, das \emph{pooling} Fenster und die Anzahl der Neuronen in der voll verbundenen Schicht. Welche Auswirkung hat das auf die Performance?
-\item [9.] Was ist die kleinst mögliche Konfiguration, die noch gute Ergebnisse liefert?
-\item [10.] Versuche es ohne \emph{Pooling}. Ändert sich die Klassifikationsgenauigkeit oder die Trainingszeit?
-\end{itemize}
-
-\begin{itemize}
-\item Was kann man überhaupt Einstellen, welche Variablen gibt es.
-\item Was haben wir zusätzlich eingebaut?
-\item Was bedeutet pooling und convolution, hier genau erklären was da passiert.
-\item Dropout bringt was?
-\end{itemize}
+\IEEEPARstart{I}{m} Rahmen des ersten praktischen Projekts der Vorlesung \glqq Machine Learning II - Deep Learning\grqq\ haben wir ein Convolutional Neural Network, kurz CNN, selbst programmiert und umfangreich getestet. Als Trainings- und Testdatensatz nutzen wir dazu den bereits vom verwendeten Framework \glqq Tensorflow\grqq\ mitgelieferten MNIST Datensatz \glqq Handwritten Digits\grqq\. Durch Einsatz verschiedener Kombinationen von convolutional layers und pooling layers konnten wir die darin enthaltenen handschriftlich notierten Zahlen klassifizieren. Die Fehlerrate konnten wir durch den Einsatz von zwei convolutional layers und zwei pooling layers mit einer learning rate von 0.01 bzw. einer adaptive Rate bis auf 2\% beschränken.
 
 \section{Die Architektur}
 Unsere Architektur besteht insgesamt aus sechs Layern.
@@ -212,7 +192,7 @@ Dabei ist unsere Architektur in einen Teil von Convolutional und Pooling Layern 
 
 \noindent Nun zu der Entstehung unserer Architektur. Wir haben unser neuronales Netz ausgehend von der vorherigen Übung aufgebaut, dabei haben wir schrittweise mehr Layer hinzugefügt und die Funktionalität unseres Netzes nach jedem Schritt überprüft. Zuerst haben wir einen Convulutional Layer samt Aktivierungsfunktion eingefügt. Daraufhin haben wir, wie es in der Vorlesung schon beschrieben wurde, einen Pooling Layer hinter die Convulution geschaltet. Dies haben wir wiederholt und einen zweiten Convulutional Layer samt Aktivierung und Pooling eingefügt. Diesmal mit einer anderen Filtergröße. Um unsere Ergebnisse weiter zu verbessern, haben wir einen zweiten Fully Connected Layer vor den Ausgabelayer geschaltet. Außerdem kam als letztes noch Dropout zwischen den beiden Fully Connected Layern als Funktion dazu.\\
 
-\noindent Unsere Convulutional Layer nutzten in unseren Versuchen Filter in den Größen zwischen 3x3 und 7x7, wobei wir in unserer finalen Konfiguration nicht über eine Filtergröße hinausgehen. Außerdem haben wir in den Layern mit der Anzahl der Filter zwischen 16 und 64 experimentiert, wobei bereits mit 16 Filtern eine Genauigkeit von über 90\% erzielt wurde.\\
+\noindent Unsere Convulutional Layer nutzten in unseren Versuchen Filter in den Größen zwischen $3\times 3$ und $7\times 7$, wobei wir in unserer finalen Konfiguration nicht über eine Filtergröße hinausgehen. Außerdem haben wir in den Layern mit der Anzahl der Filter zwischen 16 und 64 experimentiert, wobei bereits mit 16 Filtern eine Genauigkeit von über 90\% erzielt wurde.\\
 
 \noindent Als Pooling nutzen wir $2\times 2$-max-Pooling mit 2er Strides zur Reduzierung der Auflösung der Inputdaten. Damit brechen wir die Daten insgesamt von $28\times 28$ Pixel auf $7\times 7$-Pixel herunter. Dies wirkt sich enorm positiv auf die Laufzeit unseres Netzes aus. Eine weitere Reduzierung der Auflösung war uns jedoch nicht möglich, da 7 prim ist.\\
 
@@ -221,6 +201,7 @@ Dabei ist unsere Architektur in einen Teil von Convolutional und Pooling Layern 
 Die \emph{keep probability} bei unserem \emph{Dropout} haben wir zwischen 50\% und 90\% schwanken lassen, ohne dass sich Auswirkungen auf das Ergebnis gezeigt hätten.
 Generell war unsere Architektur maßgeblich durch den verfügbaren Arbeitsspeicher der Hardware begrenzt. Bei Versuchen mit mehr Convulution Filtern oder einer höheren Anzahl an Neuronen in den Fully Connected Layern traten sehr schnell Speicherfehler auf, welche zum Absturz unseres Netzes führten.\\
 
+\newpage
 \noindent Nun noch einmal unsere Architektur in Kurzform:
 
 \begin{scriptsize}
@@ -273,7 +254,6 @@ Um eine Test-Accuracy von über 98\% zu erreichen, benötigt ein Rechner (z.B. a
 \includegraphics[scale=0.5]{test_accuracy_adapt_rate}
 \caption{Test \emph{accuracy} bei adaptiver Lernrate.}
 \end{figure}
-\newpage
 \appendices
 \section{Code-Schnipsel}
 
