@@ -1,3 +1,7 @@
 Project 1/data/*
 *.DS_Store
 .idea/
+/Project 1/report/*.aux
+/Project 1/report/*.log
+/Project 1/report/*.gz
+/Project 1/report/*.thm
