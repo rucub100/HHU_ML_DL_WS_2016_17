@@ -5,3 +5,4 @@ Project 1/data/*
 /Project 1/report/*.log
 /Project 1/report/*.gz
 /Project 1/report/*.thm
+.ipynb_checkpoints
